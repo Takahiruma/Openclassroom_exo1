@@ -21,6 +21,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -201,6 +203,7 @@ fun verifyAndCreateAnimal(
   return true
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateAnimal(
   modifier: Modifier = Modifier,
@@ -216,7 +219,7 @@ private fun CreateAnimal(
   onBreedChanged: (Breed) -> Unit
 ) {
     val scrollState = rememberScrollState()
-    var breedMenuExpanded by remember { mutableStateOf(false) }
+    var isExpanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = modifier
@@ -233,38 +236,33 @@ private fun CreateAnimal(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Box(modifier = Modifier.fillMaxWidth()) {
+        ExposedDropdownMenuBox(
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .fillMaxWidth(),
+            expanded = isExpanded,
+            onExpandedChange = { isExpanded = it }
+        ) {
             OutlinedTextField(
-                value = stringResource(id = breed.translatedName),
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Breed") },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
-                        contentDescription = "Open menu",
-                    )
-                },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable { breedMenuExpanded = !breedMenuExpanded }  // clickable here
+                    .menuAnchor(),
+                value = breed.name,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isExpanded) },
+                label = { Text(text = stringResource(id = R.string.hint_breed)) },
             )
-
-            DropdownMenu(
-                expanded = breedMenuExpanded,
-                onDismissRequest = { breedMenuExpanded = false },
-                modifier = Modifier.fillMaxWidth()
+            ExposedDropdownMenu(
+                expanded = isExpanded,
+                onDismissRequest = { isExpanded = false }
             ) {
-                Breed.entries.forEach { breed ->
+                Breed.entries.forEach {
                     DropdownMenuItem(
+                        text = { Text(text =  it.name) },
                         onClick = {
-                            onBreedChanged(breed)
-                            breedMenuExpanded = false
-                        },
-                        text = {
-                            Text(
-                                text = breed.name.replaceFirstChar { it.uppercase() }
-                            )
+                            onBreedChanged(it)
+                            isExpanded = false
                         }
                     )
                 }

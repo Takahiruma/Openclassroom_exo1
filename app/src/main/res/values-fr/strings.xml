@@ -1,5 +1,5 @@
 <resources>
-  <string name="app_name">P2</string>
+  <string name="app_name">P1</string>
 
   <!-- Strings used for fragments for navigation -->
   <string name="home_fragment_label">Accueil</string>
